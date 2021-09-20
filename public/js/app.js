@@ -4,9 +4,15 @@ const form = document.querySelector("form");
 const input = document.getElementById("msg-input");
 const formBtn = form.querySelector("button");
 const locationBtn = document.getElementById("send-location");
+const messages = document.getElementById("msgs");
+
+const msgTemplate = document.getElementById("msg-temp").innerHTML;
 
 socket.on("message", (message) => {
 	console.log(message);
+	const html = Mustache.render(msgTemplate, { msg: message });
+
+	messages.insertAdjacentHTML("beforeend", html);
 });
 
 form.addEventListener("submit", (e) => {
