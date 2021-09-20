@@ -19,7 +19,12 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-	console.log("A user just connected!");
+  console.log("A user just connected!");
+  socket.emit('message', 'Welcome!')
+
+  socket.on('sendMessage', (msg) => {
+    io.emit('message', msg)
+  })
 });
 
 server.listen(5000, () => {
