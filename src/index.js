@@ -3,6 +3,7 @@ const http = require("http");
 const express = require("express");
 const chalk = require("chalk");
 const { Server } = require("socket.io");
+const Filter = require("bad-words");
 
 const app = express();
 const server = http.createServer(app);
@@ -24,8 +25,14 @@ io.on("connection", (socket) => {
 	socket.broadcast.emit("message", "A user just connected!");
 
 	socket.on("sendMessage", (msg, cb) => {
+		const filter = new Filter();
+
+		if (filter.isProfane(msg)) {
+			return cb("Profane words not allowed");
+		}
+
 		io.emit("message", msg);
-		cb("message delivered!");
+		cb();
 	});
 
 	socket.on("sendLocation", (location, cb) => {

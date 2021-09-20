@@ -13,8 +13,11 @@ form.addEventListener("submit", (e) => {
 
 	const msg = input.value;
 	if (msg) {
-		socket.emit("sendMessage", msg, (deliveryMsg) => {
-			console.log(deliveryMsg);
+		socket.emit("sendMessage", msg, (error) => {
+			if (error) {
+				return console.log(error);
+			}
+			console.log("message delivered");
 		});
 
 		input.value = "";
