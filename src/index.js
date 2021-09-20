@@ -23,15 +23,18 @@ io.on("connection", (socket) => {
 
 	socket.broadcast.emit("message", "A user just connected!");
 
-	socket.on("sendMessage", (msg) => {
+	socket.on("sendMessage", (msg, cb) => {
 		io.emit("message", msg);
+		cb("message delivered!");
 	});
 
-  socket.on("sendLocation", (location) => {
+	socket.on("sendLocation", (location, cb) => {
 		io.emit(
 			"message",
 			`https://google.com/maps?q=${location.lat},${location.long}`
 		);
+
+		cb("message delivered!");
 	});
 
 	socket.on("disconnect", () => {

@@ -13,7 +13,10 @@ form.addEventListener("submit", (e) => {
 
 	const msg = input.value;
 	if (msg) {
-		socket.emit("sendMessage", msg);
+		socket.emit("sendMessage", msg, (deliveryMsg) => {
+			console.log(deliveryMsg);
+		});
+
 		input.value = "";
 	}
 });
@@ -24,9 +27,13 @@ locationBtn.addEventListener("click", (e) => {
 	}
 
 	navigator.geolocation.getCurrentPosition((position) => {
-		socket.emit("sendLocation", {
+		const location = {
 			lat: position?.coords?.latitude,
 			long: position?.coords?.longitude,
+		};
+
+		socket.emit("sendLocation", location, (deliveryMsg) => {
+			console.log(deliveryMsg);
 		});
 	});
 });
