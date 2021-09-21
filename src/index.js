@@ -4,6 +4,12 @@ const express = require("express");
 const chalk = require("chalk");
 const { Server } = require("socket.io");
 const Filter = require("bad-words");
+const {
+	addUser,
+	removeUser,
+	getUser,
+	getUsersInRoom,
+} = require("./utils/users");
 
 const app = express();
 const server = http.createServer(app);
@@ -27,28 +33,38 @@ io.on("connection", (socket) => {
 		};
 	};
 
+	socket.on("join", ({ username, room }, cb) => {
+		const { user, error } = addUser({ id: socket.id, username, room });
+
+		if (error) {
+			return cb(error);
+		}
+
+		socket.join(user.room);
+
+		socket.emit("message", generateMsg("Welcome!"));
+		socket.broadcast
+			.to(room)
+			.emit("message", generateMsg(`${user.username} as joined!`));
+
+		cb();
+	});
+
 	socket.on("sendMessage", (msg, cb) => {
 		const filter = new Filter();
+		const user = getUser(socket.id);
 
 		if (filter.isProfane(msg)) {
 			return cb("Profane words not allowed");
 		}
 
-		io.emit("message", generateMsg(msg));
+		io.to(user.room).emit("message", generateMsg(msg));
 		cb();
 	});
 
-	socket.on("join", ({ username, room }) => {
-		socket.join(room);
-
-		socket.emit("message", generateMsg("Welcome!"));
-		socket.broadcast
-			.to(room)
-			.emit("message", generateMsg(`${username} as joined!`));
-	});
-
 	socket.on("sendLocation", (location, cb) => {
-		io.emit(
+		const user = getUser(socket.id);
+		io.to(user.room).emit(
 			"locationMessage",
 			generateMsg(`https://google.com/maps?q=${location.lat},${location.long}`)
 		);
@@ -57,7 +73,14 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("disconnect", () => {
-		io.emit("message", generateMsg("A user just left!"));
+		const user = removeUser(socket.id);
+
+		if (user) {
+			io.to(user.room).emit(
+				"message",
+				generateMsg(`A ${user.username} has left!`)
+			);
+		}
 	});
 });
 
