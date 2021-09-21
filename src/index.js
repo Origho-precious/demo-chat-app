@@ -26,11 +26,8 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-	const generateMsg = (msg) => {
-		return {
-			msg,
-			createdAt: new Date().getTime(),
-		};
+	const generateMsg = (username, msg) => {
+		return { username, msg, createdAt: new Date().getTime() };
 	};
 
 	socket.on("join", ({ username, room }, cb) => {
@@ -42,10 +39,15 @@ io.on("connection", (socket) => {
 
 		socket.join(user.room);
 
-		socket.emit("message", generateMsg("Welcome!"));
+		socket.emit("message", generateMsg("Admin", "Welcome!"));
 		socket.broadcast
-			.to(room)
-			.emit("message", generateMsg(`${user.username} as joined!`));
+			.to(user.room)
+			.emit("message", generateMsg("Admin", `${user.username} has joined!`));
+
+		io.to(user.room).emit("roomData", {
+			room: user.room,
+			users: getUsersInRoom(user.room),
+		});
 
 		cb();
 	});
@@ -58,15 +60,20 @@ io.on("connection", (socket) => {
 			return cb("Profane words not allowed");
 		}
 
-		io.to(user.room).emit("message", generateMsg(msg));
+		io.to(user.room).emit("message", generateMsg(user.username, msg));
+
 		cb();
 	});
 
 	socket.on("sendLocation", (location, cb) => {
 		const user = getUser(socket.id);
+
 		io.to(user.room).emit(
 			"locationMessage",
-			generateMsg(`https://google.com/maps?q=${location.lat},${location.long}`)
+			generateMsg(
+				user.username,
+				`https://google.com/maps?q=${location.lat},${location.long}`
+			)
 		);
 
 		cb("message delivered!");
@@ -78,8 +85,13 @@ io.on("connection", (socket) => {
 		if (user) {
 			io.to(user.room).emit(
 				"message",
-				generateMsg(`A ${user.username} has left!`)
+				generateMsg("Admin", `${user.username} has left!`)
 			);
+
+			io.to(user.room).emit("roomData", {
+				room: user.room,
+				users: getUsersInRoom(user.room),
+			});
 		}
 	});
 });
