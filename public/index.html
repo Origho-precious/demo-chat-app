@@ -8,27 +8,37 @@
 		<link rel="stylesheet" href="./css/styles.css" />
 	</head>
 	<body>
-		<h2>Chat App!</h2>
+		<div class="chat">
+			<div class="chat__sidebar"></div>
+			<div class="chat__main">
+				<div class="chat__messages" id="msgs"></div>
 
-		<div id="msgs"></div>
-
-		<form>
-			<input id="msg-input" type="text" />
-			<button type="submit">Send Message</button>
-		</form>
-
-		<button id="send-location" type="button">Send Location</button>
-
+				<div class="compose">
+					<form>
+						<input id="msg-input" type="text" />
+						<button type="submit">Send</button>
+					</form>
+					<button id="send-location" type="button">Send Location</button>
+				</div>
+			</div>
+		</div>
 		<script id="msg-temp" type="text/html">
-			<div>
-				<p>{{createdAt}} - {{msg}}</p>
+			<div class="message">
+				<p>
+					<span class="message__name">Some User Name</span>
+					<span class="message__meta">{{createdAt}}</span>
+				</p>
+				<p>{{msg}}</p>
 			</div>
 		</script>
 
 		<script id="location-temp" type="text/html">
 			<div style="margin-bottom: 1rem;">
 				<p>
-					{{createdAt}} -
+					<span class="message__name">Some User Name</span>
+					<span class="message__meta">{{createdAt}}</span>
+				</p>
+				<p>
 					<a href="{{location}}" target="='_blank" rel="noreferrer noopener"
 						>My current location</a
 					>
