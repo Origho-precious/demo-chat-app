@@ -9,10 +9,14 @@ const messages = document.getElementById("msgs");
 const msgTemplate = document.getElementById("msg-temp").innerHTML;
 const locationTemplate = document.getElementById("location-temp").innerHTML;
 
+const { username, room } = Qs.parse(location.search, {
+	ignoreQueryPrefix: true,
+});
+
 socket.on("message", (message) => {
 	const html = Mustache.render(msgTemplate, {
 		msg: message.msg,
-		createdAt: moment(message.createdAt).format('h:mm a'),
+		createdAt: moment(message.createdAt).format("h:mm a"),
 	});
 
 	messages.insertAdjacentHTML("beforeend", html);
@@ -68,3 +72,5 @@ locationBtn.addEventListener("click", (e) => {
 		});
 	});
 });
+
+socket.emit("join", { username, room });

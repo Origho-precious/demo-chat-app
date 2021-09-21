@@ -27,10 +27,6 @@ io.on("connection", (socket) => {
 		};
 	};
 
-	socket.emit("message", generateMsg("Welcome!"));
-
-	socket.broadcast.emit("message", generateMsg("A user just connected!"));
-
 	socket.on("sendMessage", (msg, cb) => {
 		const filter = new Filter();
 
@@ -40,6 +36,15 @@ io.on("connection", (socket) => {
 
 		io.emit("message", generateMsg(msg));
 		cb();
+	});
+
+	socket.on("join", ({ username, room }) => {
+		socket.join(room);
+
+		socket.emit("message", generateMsg("Welcome!"));
+		socket.broadcast
+			.to(room)
+			.emit("message", generateMsg(`${username} as joined!`));
 	});
 
 	socket.on("sendLocation", (location, cb) => {
