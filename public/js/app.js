@@ -10,13 +10,16 @@ const msgTemplate = document.getElementById("msg-temp").innerHTML;
 const locationTemplate = document.getElementById("location-temp").innerHTML;
 
 socket.on("message", (message) => {
-	const html = Mustache.render(msgTemplate, { msg: message });
+	const html = Mustache.render(msgTemplate, {
+		msg: message.msg,
+		createdAt: moment(message.createdAt).format('h:mm a'),
+	});
 
 	messages.insertAdjacentHTML("beforeend", html);
 });
 
 socket.on("locationMessage", (location) => {
-	const html = Mustache.render(locationTemplate, { location });
+	const html = Mustache.render(locationTemplate, { location: location.msg });
 
 	messages.insertAdjacentHTML("beforeend", html);
 });

@@ -20,9 +20,16 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-	socket.emit("message", "Welcome!");
+	const generateMsg = (msg) => {
+		return {
+			msg,
+			createdAt: new Date().getTime(),
+		};
+	};
 
-	socket.broadcast.emit("message", "A user just connected!");
+	socket.emit("message", generateMsg("Welcome!"));
+
+	socket.broadcast.emit("message", generateMsg("A user just connected!"));
 
 	socket.on("sendMessage", (msg, cb) => {
 		const filter = new Filter();
@@ -31,21 +38,21 @@ io.on("connection", (socket) => {
 			return cb("Profane words not allowed");
 		}
 
-		io.emit("message", msg);
+		io.emit("message", generateMsg(msg));
 		cb();
 	});
 
 	socket.on("sendLocation", (location, cb) => {
 		io.emit(
 			"locationMessage",
-			`https://google.com/maps?q=${location.lat},${location.long}`
+			generateMsg(`https://google.com/maps?q=${location.lat},${location.long}`)
 		);
 
 		cb("message delivered!");
 	});
 
 	socket.on("disconnect", () => {
-		io.emit("message", "A user just left!");
+		io.emit("message", generateMsg("A user just left!"));
 	});
 });
 
