@@ -9,7 +9,7 @@
 	<body>
 		<h2>Chat App!</h2>
 
-    <div id="msgs"></div>
+		<div id="msgs"></div>
 
 		<form>
 			<input id="msg-input" type="text" />
@@ -21,6 +21,14 @@
 		<script id="msg-temp" type="text/html">
 			<div>
 				<p>{{msg}}</p>
+			</div>
+		</script>
+
+		<script id="location-temp" type="text/html">
+			<div style="margin-bottom: 1rem;">
+				<a href="{{location}}" target="='_blank" rel="noreferrer noopener"
+					>My current location</a
+				>
 			</div>
 		</script>
 

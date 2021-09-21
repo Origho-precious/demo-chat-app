@@ -7,10 +7,16 @@ const locationBtn = document.getElementById("send-location");
 const messages = document.getElementById("msgs");
 
 const msgTemplate = document.getElementById("msg-temp").innerHTML;
+const locationTemplate = document.getElementById("location-temp").innerHTML;
 
 socket.on("message", (message) => {
-	console.log(message);
 	const html = Mustache.render(msgTemplate, { msg: message });
+
+	messages.insertAdjacentHTML("beforeend", html);
+});
+
+socket.on("locationMessage", (location) => {
+	const html = Mustache.render(locationTemplate, { location });
 
 	messages.insertAdjacentHTML("beforeend", html);
 });
